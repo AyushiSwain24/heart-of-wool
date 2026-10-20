@@ -1,0 +1,73 @@
+-- Heart of Wool — migration 004: email notification on new order
+--
+-- Replaces the earlier "notify on new product" idea with what's actually
+-- more useful day to day: an email the moment a customer places an order,
+-- so you never miss one. Mostly dashboard steps rather than SQL — Database
+-- Webhooks are a dashboard-managed feature. Follow the numbered steps
+-- below in order. If you previously set up notify-new-product (email on
+-- new product), you can leave that webhook in place too, or delete it —
+-- either is fine, they don't conflict.
+
+-- ─────────────────────────────────────────────────────────────
+-- STEP 1 — Deploy the Edge Function (run from your terminal, in the
+-- project root, with the Supabase CLI installed — you've already done
+-- `supabase login` and `supabase link` if you set up notify-new-product
+-- earlier, so you can skip straight to this):
+--
+--   npx supabase functions deploy notify-new-order
+-- ─────────────────────────────────────────────────────────────
+
+-- ─────────────────────────────────────────────────────────────
+-- STEP 2 — Set the function's secrets (if you already set these for
+-- notify-new-product, they're shared across all your project's functions
+-- — you do NOT need to set them again):
+--
+--   npx supabase secrets set RESEND_API_KEY=re_your_key_here
+--   npx supabase secrets set NOTIFY_TO_EMAIL=you@example.com
+--   npx supabase secrets set NOTIFY_FROM_EMAIL=onboarding@resend.dev
+--
+-- NOTIFY_TO_EMAIL supports MULTIPLE recipients, comma-separated:
+--   npx supabase secrets set NOTIFY_TO_EMAIL=you@example.com,partner@example.com
+--
+-- IMPORTANT — Resend's free/unverified tier only delivers to the email
+-- address you signed up to Resend with, when sending from the shared
+-- onboarding@resend.dev address. If NOTIFY_TO_EMAIL is set to a
+-- DIFFERENT address (or you add a second recipient), those sends will
+-- fail with a 403 "You can only send testing emails to your own email
+-- address" error — this is a Resend account restriction, not a bug here.
+-- To send to any address (customers, a second team member, etc.), verify
+-- a domain at resend.com/domains and set NOTIFY_FROM_EMAIL to an address
+-- on that domain, e.g. notifications@heartofwool.shop.
+-- ─────────────────────────────────────────────────────────────
+
+-- ─────────────────────────────────────────────────────────────
+-- STEP 3 — Create the Database Webhook in the dashboard:
+--
+--   Sidebar -> Database -> Webhooks -> Create a new hook
+--     Name: notify-new-order
+--     Table: orders
+--     Events: check only "Insert"
+--     Type: Supabase Edge Functions
+--     Edge Function: notify-new-order
+--     HTTP Method: POST
+--     HTTP Headers: leave default (Supabase adds auth automatically)
+--   Click Create.
+-- ─────────────────────────────────────────────────────────────
+
+-- ─────────────────────────────────────────────────────────────
+-- STEP 4 — Test it:
+--   Place a real test order through your live site's checkout flow (the
+--   easiest way to trigger a genuine `orders` insert, since place_order
+--   is what actually creates the row — inserting directly via SQL would
+--   skip the stock-check logic and isn't representative). Use your own
+--   name/email so you can tell it apart from real orders, then check your
+--   inbox within a minute or two.
+--
+--   Afterward, you can update that test order's status to "cancelled"
+--   from /admin so it doesn't get confused with a real one, or just leave
+--   it — it costs nothing to have a stray cancelled test order sitting
+--   there.
+-- ─────────────────────────────────────────────────────────────
+
+-- No SQL needs to run in this file — it exists to document the steps
+-- above and keep them versioned alongside the rest of the schema.

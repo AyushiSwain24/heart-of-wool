@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Playfair Display", "Georgia", serif;
+  --font-sans: "Poppins", "system-ui", sans-serif;
+
+  --color-cream: #fdf6ec;
+  --color-cream-deep: #f7ead4;
+  --color-olive: #4a4635;
+  --color-olive-soft: #7a7460;
+  --color-pink: #e8a0a8;
+  --color-pink-deep: #d97e8c;
+
+  --color-background: #fdf6ec;
+  --color-foreground: #4a4635;
+  --color-card: #fffdf9;
+  --color-card-foreground: #4a4635;
+  --color-primary: #e8a0a8;
+  --color-primary-foreground: #fffdf9;
+  --color-secondary: #f7ead4;
+  --color-secondary-foreground: #4a4635;
+  --color-muted: #f2e6d3;
+  --color-muted-foreground: #7a7460;
+  --color-accent: #d97e8c;
+  --color-accent-foreground: #fffdf9;
+  --color-destructive: #c0392b;
+  --color-destructive-foreground: #fffdf9;
+  --color-border: rgba(74, 70, 53, 0.12);
+  --color-input: rgba(74, 70, 53, 0.16);
+  --color-ring: #d97e8c;
+
+  --shadow-soft: 0 4px 14px rgba(74, 70, 53, 0.08);
+  --shadow-card: 0 8px 24px rgba(74, 70, 53, 0.1);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+.shadow-card {
+  box-shadow: var(--shadow-card);
+}
